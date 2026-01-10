@@ -893,6 +893,20 @@ function updateCart() {
         cartTotal.textContent = '0 so\'m';
         cartData.value = '[]';
         submitBtn.disabled = true;
+        
+        // Reset breakdown display
+        const subtotalEl = document.getElementById('cartSubtotal');
+        if (subtotalEl) subtotalEl.textContent = '0 so\'m';
+        
+        // Hide breakdown rows
+        const serviceChargeRow = document.getElementById('serviceChargeRow');
+        const deliveryFeeRow = document.getElementById('deliveryFeeRow');
+        const discountRow = document.getElementById('discountRow');
+        
+        if (serviceChargeRow) serviceChargeRow.style.display = 'none';
+        if (deliveryFeeRow) deliveryFeeRow.style.display = 'none';
+        if (discountRow) discountRow.style.display = 'none';
+        
         return;
     }
     
@@ -1063,6 +1077,143 @@ function confirmOrder() {
 
 // Remove beforeunload warning - we have custom confirmation now
 // (No beforeunload event listener)
+
+// Settings for breakdown calculation
+const settings = {
+    serviceChargePercentage: <?= $serviceChargePercentage ?>,
+    deliveryFeeType: '<?= $deliveryFeeType ?>',
+    deliveryFeeValue: <?= $deliveryFeeValue ?>,
+    discountPercentage: <?= $discountPercentage ?>
+};
+
+// Update cart breakdown display
+function updateCartBreakdown() {
+    // If cart is empty, reset all values to 0
+    if (cart.length === 0) {
+        const subtotalEl = document.getElementById('cartSubtotal');
+        const totalEl = document.getElementById('cartTotal');
+        
+        if (subtotalEl) subtotalEl.textContent = '0 so\'m';
+        if (totalEl) totalEl.textContent = '0 so\'m';
+        
+        // Hide all breakdown rows
+        const serviceChargeRow = document.getElementById('serviceChargeRow');
+        const deliveryFeeRow = document.getElementById('deliveryFeeRow');
+        const discountRow = document.getElementById('discountRow');
+        
+        if (serviceChargeRow) serviceChargeRow.style.display = 'none';
+        if (deliveryFeeRow) deliveryFeeRow.style.display = 'none';
+        if (discountRow) discountRow.style.display = 'none';
+        
+        return; // Exit early
+    }
+    
+    // Calculate subtotal directly from cart array
+    let subtotal = 0;
+    cart.forEach(item => {
+        subtotal += item.price * item.quantity;
+    });
+    
+    console.log('Calculated subtotal from cart:', subtotal);
+    
+    // Get current order type
+    const orderType = document.getElementById('dineInBtn')?.classList.contains('active') ? 'dine_in' : 'delivery';
+    
+    // Calculate service charge
+    const serviceCharge = (subtotal * settings.serviceChargePercentage) / 100;
+    
+    // Calculate delivery fee (only for delivery orders)
+    let deliveryFee = 0;
+    if (orderType === 'delivery') {
+        if (settings.deliveryFeeType === 'percentage') {
+            deliveryFee = (subtotal * settings.deliveryFeeValue) / 100;
+        } else {
+            deliveryFee = settings.deliveryFeeValue;
+        }
+    }
+    
+    // Calculate discount
+    const discount = (subtotal * settings.discountPercentage) / 100;
+    
+    // Calculate grand total
+    const grandTotal = subtotal + serviceCharge + deliveryFee - discount;
+    
+    console.log('Breakdown:', {subtotal, serviceCharge, deliveryFee, discount, grandTotal});
+    
+    // Update display - make sure elements exist
+    const subtotalEl = document.getElementById('cartSubtotal');
+    const totalEl = document.getElementById('cartTotal');
+    
+    if (subtotalEl) subtotalEl.textContent = formatCurrency(subtotal);
+    if (totalEl) totalEl.textContent = formatCurrency(grandTotal);
+    
+    // Show/hide service charge
+    const serviceChargeRow = document.getElementById('serviceChargeRow');
+    if (serviceChargeRow) {
+        if (serviceCharge > 0) {
+            serviceChargeRow.style.display = 'block';
+            const amountEl = document.getElementById('serviceChargeAmount');
+            if (amountEl) amountEl.textContent = formatCurrency(serviceCharge);
+        } else {
+            serviceChargeRow.style.display = 'none';
+        }
+    }
+    
+    // Show/hide delivery fee
+    const deliveryFeeRow = document.getElementById('deliveryFeeRow');
+    if (deliveryFeeRow) {
+        if (deliveryFee > 0) {
+            deliveryFeeRow.style.display = 'block';
+            const amountEl = document.getElementById('deliveryFeeAmount');
+            if (amountEl) amountEl.textContent = formatCurrency(deliveryFee);
+        } else {
+            deliveryFeeRow.style.display = 'none';
+        }
+    }
+    
+    // Show/hide discount
+    const discountRow = document.getElementById('discountRow');
+    if (discountRow) {
+        if (discount > 0) {
+            discountRow.style.display = 'block';
+            const amountEl = document.getElementById('discountAmount');
+            if (amountEl) amountEl.textContent = '-' + formatCurrency(discount);
+        } else {
+            discountRow.style.display = 'none';
+        }
+    }
+}
+
+// Override existing renderCart if it exists
+if (typeof window.renderCart === 'function') {
+    const originalRenderCart = window.renderCart;
+    window.renderCart = function(...args) {
+        originalRenderCart(...args);
+        setTimeout(updateCartBreakdown, 100);
+    };
+}
+
+// Helper - format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount).replace(/,/g, ' ') + " so'm";
+}
+
+// Update breakdown periodically and on interactions
+setInterval(updateCartBreakdown, 500);
+
+// Listen for order type button clicks
+document.addEventListener('click', function(e) {
+    const target = e.target;
+    if (target.id === 'dineInBtn' || target.id === 'deliveryBtn') {
+        setTimeout(updateCartBreakdown, 100);
+    }
+});
+
+// Initial breakdown update
+setTimeout(updateCartBreakdown, 500);
 
 </script>
 
