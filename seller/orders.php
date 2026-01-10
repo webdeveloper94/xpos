@@ -1119,8 +1119,8 @@ function updateCartBreakdown() {
     // Get current order type
     const orderType = document.getElementById('dineInBtn')?.classList.contains('active') ? 'dine_in' : 'delivery';
     
-    // Calculate service charge
-    const serviceCharge = (subtotal * settings.serviceChargePercentage) / 100;
+    // Calculate service charge (only for dine-in orders, not for delivery)
+    const serviceCharge = orderType === 'dine_in' ? (subtotal * settings.serviceChargePercentage) / 100 : 0;
     
     // Calculate delivery fee (only for delivery orders)
     let deliveryFee = 0;

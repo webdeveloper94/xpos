@@ -62,8 +62,8 @@ function calculateOrderTotal($subtotal, $orderType = 'dine_in') {
     $deliveryFeeValue = floatval(getSetting('delivery_fee_value', 0));
     $discountPercentage = floatval(getSetting('discount_percentage', 0));
     
-    // Calculate service charge
-    $serviceCharge = ($subtotal * $serviceChargePercentage) / 100;
+    // Calculate service charge (only for dine-in orders, not for delivery)
+    $serviceCharge = ($orderType === 'dine_in') ? ($subtotal * $serviceChargePercentage) / 100 : 0;
     
     // Calculate delivery fee (only for delivery orders)
     $deliveryFee = 0;
