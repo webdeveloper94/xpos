@@ -132,17 +132,146 @@ include '../includes/header.php';
 ?>
 
 <style>
+/* ===== PROFESSIONAL POS LAYOUT ===== */
+/* No page scroll - fixed viewport */
+body {
+    overflow: hidden !important;
+    height: 100vh;
+}
+
+.container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: calc(100vh - 60px); /* Minus header height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Compact Statistics Bar */
+.stats-compact {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.625rem 1.5rem;
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+    border-bottom: 1px solid #bfdbfe;
+    flex-shrink: 0;
+}
+
+.stat-compact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.stat-compact-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+}
+
+.stat-compact-value {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-compact-label {
+    font-size: 0.6875rem;
+    color: var(--gray-600);
+    line-height: 1;
+    margin-top: 2px;
+}
+
+/* Main Work Area */
+.work-area {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    padding: 1rem 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Products Section - Scrollable */
+.products-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.section-header {
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    color: var(--gray-900);
+}
+
+/* Products Grid Container - This scrolls */
+.products-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+}
+
+.products-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.products-container::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 4px;
+}
+
+.products-container::-webkit-scrollbar-thumb {
+    background: var(--primary-400);
+    border-radius: 4px;
+}
+
+.products-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-500);
+}
+
 /* Category Tabs */
 .category-tabs {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-300) var(--gray-100);
+}
+
+.category-tabs::-webkit-scrollbar {
+    height: 6px;
+}
+
+.category-tabs::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: 3px;
+}
+
+.category-tabs::-webkit-scrollbar-thumb {
+    background: var(--primary-300);
+    border-radius: 3px;
 }
 
 .category-tab {
-    padding: 0.75rem 1.5rem;
+    padding: 0.625rem 1.25rem;
     background: white;
     border: 2px solid var(--gray-300);
     border-radius: var(--radius-lg);
@@ -150,7 +279,7 @@ include '../includes/header.php';
     transition: all var(--transition-fast);
     white-space: nowrap;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 .category-tab:hover {
@@ -167,9 +296,9 @@ include '../includes/header.php';
 /* Product Grid */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
 }
 
 .product-card {
@@ -191,7 +320,7 @@ include '../includes/header.php';
 
 .product-image {
     width: 100%;
-    height: 120px;
+    height: 100px;
     object-fit: cover;
     border-radius: var(--radius-md);
     margin-bottom: 0.75rem;
@@ -199,20 +328,46 @@ include '../includes/header.php';
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 2.5rem;
 }
 
-/* Cart Section */
-.order-layout {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 2rem;
+.product-card:active {
+    transform: translateY(0);
 }
 
+/* Cart Section - Sticky Full Height */
 .cart-section {
-    position: sticky;
-    top: 80px;
-    height: fit-content;
+    width: 380px;
+    flex-shrink: 0;
+    height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-section .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.cart-section .card-header {
+    flex-shrink: 0;
+    padding: 1rem 1.25rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.cart-section .card-title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.cart-section .card-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .cart-item {
@@ -232,20 +387,28 @@ include '../includes/header.php';
 }
 
 .quantity-btn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border: none;
     background: var(--primary-600);
     color: white;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 600;
+    font-size: 1.125rem;
     transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .quantity-btn:hover {
     background: var(--primary-700);
     transform: scale(1.1);
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
 }
 
 /* Order Type */
@@ -327,105 +490,75 @@ include '../includes/header.php';
 }
 
 /* Responsive */
+/* Desktop - Narrower cart for better product visibility */
+@media (max-width: 1200px) {
+    .cart-section {
+        width: 340px;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+/* Tablet - Vertical stack */
 @media (max-width: 1024px) {
-    .order-layout {
-        grid-template-columns: 1fr;
+    .work-area {
+        flex-direction: column;
+        padding: 1rem;
     }
     
     .cart-section {
-        position: static;
-        margin-top: 2rem;
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+    }
+    
+    .cart-section .card-body {
+        max-height: 40vh;
+    }
+    
+    .products-section {
+        height: auto;
+        max-height: 50vh;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
 
 @media (max-width: 768px) {
-    /* Category Tabs - Better Touch */
-    .category-tabs {
-        gap: 0.5rem;
-        padding-bottom: 1rem;
-        -webkit-overflow-scrolling: touch;
+    .container {
+        height: 100vh;
     }
     
-    .category-tab {
-        padding: 12px 20px;
+    .stats-compact {
+        padding: 0.5rem 1rem;
+        gap: 1rem;
+    }
+    
+    .stat-compact-icon {
+        width: 32px;
+        height: 32px;
         font-size: 1rem;
-        min-height: 48px;
-        display: flex;
-        align-items: center;
     }
     
-    /* Product Grid - 2 columns */
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
+    .stat-compact-value {
+        font-size: 0.9rem;
     }
     
-    .product-card {
+    .stat-compact-label {
+        font-size: 0.625rem;
+    }
+    
+    .work-area {
         padding: 0.75rem;
-        min-height: 200px;
-    }
-    
-    .product-image {
-        height: 100px;
-    }
-    
-    /* Stats Bar */
-    .stats-bar {
         flex-direction: column;
-        gap: 0.75rem;
     }
     
-    .stat-mini {
-        padding: 0.75rem;
-    }
-    
-    /* Quantity Buttons - Touch Friendly */
-    .quantity-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.125rem;
-    }
-    
-    /* Cart Items */
-    .cart-item {
-        padding: 0.75rem;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    
-    /* Order Type Buttons */
-    .order-type-btn {
-        padding: 14px;
-        font-size: 1rem;
-        min-height: 52px;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Product Grid - 2 columns for quick selection */
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem;
-    }
-    
-    .product-card {
-        padding: 0.5rem;
-        min-height: auto;
-    }
-    
-    .product-image {
-        height: 80px;
-        font-size: 2rem;
-    }
-    
-    .product-card div {
-        font-size: 0.85rem;
-    }
-    
-    /* Category Tabs - Compact */
-    .category-tabs {
-        position: relative;
-        margin-bottom: 1rem;
+    .products-container {
+        padding-right: 0.25rem;
     }
     
     .category-tab {
@@ -434,49 +567,131 @@ include '../includes/header.php';
         min-height: 44px;
     }
     
-    .category-tabs::after {
-        content: '→';
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        background: linear-gradient(to left, var(--primary-100) 20%, transparent);
-        padding: 0.5rem 1rem;
-        pointer-events: none;
-        font-size: 1.25rem;
-        color: var(--primary-600);
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.625rem;
     }
     
-    /* Larger Touch Targets for Quantity */
+    .product-card {
+        padding: 0.625rem;
+    }
+    
+    .product-image {
+        height: 80px;
+        font-size: 2rem;
+    }
+    
     .quantity-btn {
-        width: 44px;
-        height: 44px;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Mobile - Bottom sheet cart */
+@media (max-width: 480px) {
+    body {
+        overflow: hidden;
+        height: 100vh;
+        position: fixed;
+        width: 100%;
     }
     
-    /* Cart Section - Compact at Bottom */
+    .container {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .stats-compact {
+        padding: 0.375rem 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .stat-compact-item {
+        gap: 0.5rem;
+    }
+    
+    .stat-compact-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.875rem;
+    }
+    
+    .stat-compact-value {
+        font-size: 0.8125rem;
+    }
+    
+    .stat-compact-label {
+        font-size: 0.5625rem;
+    }
+    
+    .work-area {
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .products-section {
+        flex: 1;
+        height: calc(60vh - 60px); /* 60% for products */
+        margin-bottom: 0;
+    }
+    
+    .products-container {
+        flex: 1;
+        padding-bottom: 0.5rem;
+    }
+    
+    .category-tabs {
+        margin-bottom: 0.5rem;
+    }
+    
+    .category-tab {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        min-height: 40px;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .product-card {
+        padding: 0.5rem;
+    }
+    
+    .product-image {
+        height: 70px;
+        font-size: 1.75rem;
+    }
+    
+    .product-card div {
+        font-size: 0.8125rem;
+    }
+    
+    /* Cart - Fixed Bottom Sheet 40% */
     .cart-section {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 100;
-        max-height: 35vh; /* Much smaller - only 35% of screen */
-        overflow-y: auto;
-        margin-top: 0;
+        width: 100%;
+        height: 40vh; /* Fixed 40% of viewport */
+        max-height: 40vh;
+        z-index: 1000;
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-        background: white;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
     }
     
     .cart-section .card {
+        height: 100%;
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-        margin-bottom: 0;
-        padding: 0.75rem;
+        box-shadow: none;
     }
     
     .cart-section .card-header {
-        padding: 0.5rem 0;
-        margin-bottom: 0.5rem;
+        padding: 0.625rem 1rem;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
     
     .cart-section .card-title {
@@ -484,39 +699,24 @@ include '../includes/header.php';
     }
     
     .cart-section .card-body {
-        padding: 0;
+        padding: 0.75rem 1rem;
+        overflow-y: auto;
     }
     
-    /* Compact Cart Items */
-    #cartItems .cart-item {
-        padding: 0.5rem;
-        font-size: 0.85rem;
-    }
-    
-    #cartItems .cart-item > div:first-child {
-        flex: 1;
-        min-width: 0;
-    }
-    
-    #cartItems .cart-item div {
-        font-size: 0.8rem !important;
-    }
-    
-    /* Order Type Buttons - Smaller */
     .order-type-selector {
         gap: 0.5rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.625rem;
     }
     
     .order-type-btn {
         padding: 10px;
-        font-size: 0.85rem;
-        min-height: 44px;
+        font-size: 0.8125rem;
+        min-height: 42px;
     }
     
-    /* Delivery Form - Compact */
     .delivery-form {
-        padding: 0.5rem;
+        padding: 0.625rem;
+        margin-bottom: 0.625rem;
     }
     
     .delivery-form .form-group {
@@ -526,93 +726,56 @@ include '../includes/header.php';
     .delivery-form input,
     .delivery-form textarea {
         padding: 8px;
-        font-size: 14px;
+        font-size: 0.875rem;
     }
     
-    /* Total Section - Compact */
-    .cart-section #cartTotal {
-        font-size: 1.125rem;
-    }
-    
-    /* Submit Button - Visible */
-    #submitOrderBtn {
-        padding: 12px;
-        font-size: 0.95rem;
-        min-height: 48px;
-    }
-    
-    /* Add LESS padding to bottom of products */
-    .category-products {
-        padding-bottom: 40vh; /* Space for compact cart */
-    }
-    
-    /* Stats Bar - Compact */
-    .stats-bar {
-        margin-bottom: 1rem;
-    }
-    
-    .stat-mini {
+    #cartItems .cart-item {
         padding: 0.5rem;
+        font-size: 0.8125rem;
     }
     
-    .stat-mini-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
+    .quantity-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
     }
     
-    .stat-mini div {
-        font-size: 1.25rem !important;
-    }
-    
-    .stat-mini div:last-child {
-        font-size: 0.75rem !important;
+    #submitOrderBtn {
+        padding: 11px;
+        font-size: 0.875rem;
+        min-height: 44px;
     }
 }
 
-/* Very small screens - 3 columns */
-@media (max-width: 360px) {
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Slightly larger screens - 3 columns */
-@media (min-width: 481px) and (max-width: 768px) {
-    .product-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.75rem;
-    }
-}
 
 </style>
 
-<div class="container" style="padding: 2rem 0;">
-    <!-- Today's Stats -->
-    <div class="stats-bar">
-        <div class="stat-mini">
-            <div class="stat-mini-icon" style="background: var(--primary-100); color: var(--primary-600);">
+<div class="container">
+    <!-- Compact Statistics Bar -->
+    <div class="stats-compact">
+        <div class="stat-compact-item">
+            <div class="stat-compact-icon" style="background: var(--primary-100); color: var(--primary-600);">
                 🛒
             </div>
             <div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: var(--gray-900);">
+                <div class="stat-compact-value" style="color: var(--gray-900);">
                     <?= $todayStats['order_count'] ?>
                 </div>
-                <div style="font-size: 0.875rem; color: var(--gray-600);">
+                <div class="stat-compact-label">
                     Bugungi buyurtmalar
                 </div>
             </div>
         </div>
         
-        <div class="stat-mini">
-            <div class="stat-mini-icon" style="background: #d1fae5; color: var(--success);">
+        <div class="stat-compact-item">
+            <div class="stat-compact-icon" style="background: #d1fae5; color: var(--success);">
                 💰
             </div>
             <div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">
+                <div class="stat-compact-value" style="color: var(--success);">
                     <?= formatCurrency($todayStats['total_amount']) ?>
                 </div>
-                <div style="font-size: 0.875rem; color: var(--gray-600);">
+                <div class="stat-compact-label">
                     Bugungi savdo
                 </div>
             </div>
@@ -620,35 +783,38 @@ include '../includes/header.php';
     </div>
     
     <?php if (isset($success)): ?>
-        <div class="alert alert-success"><?= $success ?></div>
+        <div class="alert alert-success" style="margin: 0.5rem 1.5rem; flex-shrink: 0;"><?= $success ?></div>
     <?php endif; ?>
     
     <?php if (isset($error)): ?>
-        <div class="alert alert-danger"><?= $error ?></div>
+        <div class="alert alert-danger" style="margin: 0.5rem 1.5rem; flex-shrink: 0;"><?= $error ?></div>
     <?php endif; ?>
     
-    <h2 style="margin-bottom: 0.5rem;">Mahsulotlarni tanlang va buyurtma yarating</h2>
-    
-    <!-- Category Tabs -->
-    <div class="category-tabs">
-        <?php
-        $categories->data_seek(0);
-        $first = true;
-        foreach ($productsByCategory as $catId => $catData):
-        ?>
-            <button class="category-tab <?= $first ? 'active' : '' ?>" onclick="selectCategory(<?= $catId ?>)">
-                <?= htmlspecialchars($catData['name']) ?>
-            </button>
-        <?php 
-            $first = false;
-        endforeach; 
-        ?>
-    </div>
-    
-    <div class="order-layout">
+    <!-- Main Work Area -->
+    <div class="work-area">
         <!-- Products Section -->
-        <div>
-            <?php foreach ($productsByCategory as $catId => $catData): ?>
+        <div class="products-section">
+            <div class="section-header">
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <?php
+                    $categories->data_seek(0);
+                    $first = true;
+                    foreach ($productsByCategory as $catId => $catData):
+                    ?>
+                        <button class="category-tab <?= $first ? 'active' : '' ?>" onclick="selectCategory(<?= $catId ?>)">
+                            <?= htmlspecialchars($catData['name']) ?>
+                        </button>
+                    <?php 
+                        $first = false;
+                    endforeach; 
+                    ?>
+                </div>
+            </div>
+            
+            <!-- Products Grid Container (Scrollable) -->
+            <div class="products-container">
+                <?php foreach ($productsByCategory as $catId => $catData): ?>
                 <div class="category-products <?= $catId === array_key_first($productsByCategory) ? 'active' : '' ?>" id="category-<?= $catId ?>">
                     <div class="product-grid">
                         <?php foreach ($catData['products'] as $product): ?>
@@ -681,7 +847,8 @@ include '../includes/header.php';
                     </div>
                 </div>
             <?php endif; ?>
-        </div>
+            </div> <!-- Close products-container -->
+        </div> <!-- Close products-section -->
         
         <!-- Cart Section -->
         <div class="cart-section">
@@ -772,9 +939,9 @@ include '../includes/header.php';
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+        </div> <!-- Close cart-section -->
+    </div> <!-- Close work-area -->
+</div> <!-- Close container -->
 
 <script>
 let cart = [];

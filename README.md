@@ -33,6 +33,14 @@ Zamonaviy fast food tizimi uchun boshqaruv paneli.
 - Login: `admin`
 - Parol: `admin123`
 
+**Menejer:**
+- Login: `manager`
+- Parol: `manager`
+
+**Sotuvchi:**
+- Login: `seller`
+- Parol: `seller`
+
 ## Tuzilma
 
 ```
@@ -51,7 +59,3 @@ xpos/
 ├── super_admin/         # Super admin paneli
 └── uploads/             # Yuklangan fayllar
 ```
-
-## Litsenziya
-
-© 2026 Fast Food Management System

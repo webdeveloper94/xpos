@@ -258,6 +258,10 @@ include '../includes/header.php';
                         <tr>
                             <th>ID</th>
                             <th>Summa</th>
+                            <th>Xizmat haqi</th>
+                            <th>Yetkazib berish haqi</th>
+                            <th>Chegirma</th>
+                            <th>Jami summa</th>
                             <th>Sotuvchi</th>
                             <th>Turi</th>
                             <th>Status</th>
@@ -278,6 +282,18 @@ include '../includes/header.php';
                                     <td>#<?= $order['id'] ?></td>
                                     <td style="font-weight: 600; color: var(--success);">
                                         <?= formatCurrency($order['total_amount']) ?>
+                                    </td>
+                                    <td style="font-weight: 600; color: var(--success);">
+                                        <?= formatCurrency($order['service_charge']) ?>
+                                    </td>
+                                    <td style="font-weight: 600; color: var(--success);">
+                                        <?= formatCurrency($order['delivery_fee']) ?>
+                                    </td>
+                                    <td style="font-weight: 600; color: var(--danger);">
+                                        <?= formatCurrency($order['discount']) ?>
+                                    </td>
+                                    <td style="font-weight: 600; color: var(--success);">
+                                        <?= formatCurrency($order['total_amount'] + $order['service_charge'] + $order['delivery_fee']) ?>
                                     </td>
                                     <td>
                                         <?= htmlspecialchars($order['seller_name'] ?? 'N/A') ?>

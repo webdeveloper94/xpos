@@ -279,6 +279,10 @@ include '../includes/header.php';
                             <th>ID</th>
                             <th>Sotuvchi</th>
                             <th>Summa</th>
+                            <th>Xizmat haqi</th>
+                            <th>Yetkazib berish haqi</th>
+                            <th>Chegirma</th>
+                            <th>Jami summa</th>
                             <th>Turi</th>
                             <th>Status</th>
                             <th>Sana</th>
@@ -298,8 +302,12 @@ include '../includes/header.php';
                                     <td>#<?= $order['id'] ?></td>
                                     <td><?= htmlspecialchars($order['seller_name']) ?></td>
                                     <td style="font-weight: 600; color: var(--success);">
-                                        <?= formatCurrency($order['total_amount']) ?>
+                                        <?= formatCurrency($order['total_amount'] + $order['service_charge'] + $order['delivery_fee']) ?>
                                     </td>
+                                    <td><?= $order['service_charge'] ?></td>
+                                    <td><?= $order['delivery_fee'] ?></td>
+                                    <td><?= $order['discount'] ?></td>
+                                    <td><?= formatCurrency($order['total_amount'] + $order['service_charge'] + $order['delivery_fee']) ?></td>
                                     <td><?= $order['order_type'] === 'delivery' ? '🚚 Yetkazish' : '🍽️ Oddiy' ?></td>
                                     <td>
                                         <span style="color: <?= $statusColor ?>; font-weight: 600;">
