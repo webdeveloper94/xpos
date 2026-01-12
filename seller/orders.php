@@ -293,6 +293,66 @@ body {
     border-color: var(--primary-600);
 }
 
+/* Search Input */
+.search-section {
+    margin-bottom: 1rem;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 0.75rem 2.75rem 0.75rem 1rem;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    font-size: 0.95rem;
+    transition: all var(--transition-fast);
+}
+
+.search-input-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary-600);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.search-icon {
+    position: absolute;
+    right: 1rem;
+    color: var(--gray-400);
+    font-size: 1.25rem;
+    pointer-events: none;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 1rem;
+    background: var(--gray-200);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--gray-600);
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+}
+
+.search-clear-btn:hover {
+    background: var(--gray-300);
+    color: var(--gray-900);
+}
+
+.search-clear-btn.show {
+    display: flex;
+}
+
 /* Product Grid */
 .product-grid {
     display: grid;
@@ -795,6 +855,18 @@ body {
         <!-- Products Section -->
         <div class="products-section">
             <div class="section-header">
+                <!-- Search Input -->
+                <div class="search-section">
+                    <div class="search-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="productSearch" 
+                            placeholder="🔍 Mahsulot qidirish..." 
+                            autocomplete="off"
+                        >
+                        <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()">&times;</button>
+                    </div>
+                </div>
                 <!-- Category Tabs -->
                 <div class="category-tabs">
                     <?php
@@ -973,7 +1045,64 @@ function selectCategory(categoryId) {
     // Show selected category
     document.getElementById('category-' + categoryId).classList.add('active');
     event.target.classList.add('active');
+    
+    // Clear search when switching categories
+    clearSearch();
 }
+
+// Search functionality
+function searchProducts() {
+    const searchInput = document.getElementById('productSearch');
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const clearBtn = document.getElementById('searchClearBtn');
+    
+    // Show/hide clear button
+    if (searchTerm.length > 0) {
+        clearBtn.classList.add('show');
+    } else {
+        clearBtn.classList.remove('show');
+    }
+    
+    // If search is empty, show all products
+    if (searchTerm === '') {
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.display = '';
+        });
+        return;
+    }
+    
+    // Filter products
+    document.querySelectorAll('.product-card').forEach(card => {
+        const productName = card.querySelector('div[style*="font-weight: 600"]').textContent.toLowerCase();
+        if (productName.includes(searchTerm)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function clearSearch() {
+    const searchInput = document.getElementById('productSearch');
+    const clearBtn = document.getElementById('searchClearBtn');
+    
+    searchInput.value = '';
+    clearBtn.classList.remove('show');
+    
+    // Show all products
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.style.display = '';
+    });
+}
+
+// Initialize search event listener
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('productSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', searchProducts);
+        searchInput.addEventListener('keyup', searchProducts);
+    }
+});
 
 function selectOrderType(type) {
     console.log('📝 Order type selected:', type);

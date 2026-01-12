@@ -43,6 +43,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $stmt->close();
         }
+    } elseif ($action === 'edit') {
+        $productId = intval($_POST['product_id']);
+        $name = sanitize($_POST['name']);
+        $categoryId = intval($_POST['category_id']);
+        $description = sanitize($_POST['description'] ?? '');
+        $price = floatval($_POST['price']);
+        
+        // Get current image
+        $stmt = $conn->prepare("SELECT image FROM products WHERE id = ?");
+        $stmt->bind_param("i", $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $currentImage = $result->fetch_assoc()['image'] ?? null;
+        $stmt->close();
+        
+        $imagePath = $currentImage; // Keep current image by default
+        
+        // Handle new image upload
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadResult = uploadImage($_FILES['image']);
+            if ($uploadResult['success']) {
+                // Delete old image if exists
+                if ($currentImage) {
+                    deleteImage($currentImage);
+                }
+                $imagePath = $uploadResult['filename'];
+            } else {
+                $error = $uploadResult['message'];
+            }
+        }
+        
+        if (empty($name) || $categoryId <= 0 || $price <= 0) {
+            $error = 'Barcha maydonlarni to\'g\'ri to\'ldiring';
+        } elseif (!isset($error)) {
+            $stmt = $conn->prepare("UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, image = ? WHERE id = ?");
+            $stmt->bind_param("issdsi", $categoryId, $name, $description, $price, $imagePath, $productId);
+            
+            if ($stmt->execute()) {
+                $success = 'Mahsulot muvaffaqiyatli yangilandi';
+            } else {
+                $error = 'Xatolik: ' . $stmt->error;
+            }
+            $stmt->close();
+        }
     } elseif ($action === 'delete') {
         $productId = intval($_POST['product_id']);
         
@@ -385,6 +429,14 @@ body {
                                     <td><?= htmlspecialchars($product['creator_name']) ?></td>
                                     <td><?= formatDate($product['created_at']) ?></td>
                                     <td>
+                                        <button onclick='openEditProductModal(<?= json_encode([
+                                            "id" => $product["id"],
+                                            "name" => $product["name"],
+                                            "category_id" => $product["category_id"],
+                                            "price" => $product["price"],
+                                            "description" => $product["description"] ?? "",
+                                            "image" => $product["image"] ?? ""
+                                        ]) ?>)' class="btn btn-primary btn-sm">✏️</button>
                                         <form method="POST" style="display: inline;" onsubmit="return confirmDelete()">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
@@ -457,6 +509,90 @@ body {
         </form>
     </div>
 </div>
+
+<!-- Edit Product Modal -->
+<div id="editProductModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Mahsulotni tahrirlash</h2>
+            <button class="close-modal" onclick="closeModal('editProductModal')">&times;</button>
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="product_id" id="edit_product_id">
+            
+            <div class="form-group">
+                <label class="form-label">Mahsulot nomi *</label>
+                <input type="text" name="name" id="edit_product_name" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Kategoriya *</label>
+                <select name="category_id" id="edit_product_category" class="form-control" required>
+                    <option value="">Tanlang...</option>
+                    <?php
+                    $categories->data_seek(0);
+                    while ($cat = $categories->fetch_assoc()):
+                    ?>
+                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Narx (so'm) *</label>
+                <input type="number" name="price" id="edit_product_price" class="form-control" step="0.01" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tavsif</label>
+                <textarea name="description" id="edit_product_description" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Rasm</label>
+                <div id="edit_current_image" style="margin-bottom: 0.5rem;"></div>
+                <input type="file" name="image" id="edit_product_image" class="form-control" accept="image/*">
+                <small style="color: var(--gray-600);">Yangi rasm yuklamasangiz, mavjud rasm saqlanadi</small>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editProductModal')">Bekor qilish</button>
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditProductModal(product) {
+    document.getElementById('edit_product_id').value = product.id;
+    document.getElementById('edit_product_name').value = product.name;
+    document.getElementById('edit_product_category').value = product.category_id;
+    document.getElementById('edit_product_price').value = product.price;
+    document.getElementById('edit_product_description').value = product.description;
+    
+    // Show current image preview
+    const currentImageDiv = document.getElementById('edit_current_image');
+    if (product.image) {
+        currentImageDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <img src="/xpos/uploads/products/${product.image}" 
+                     alt="Current" 
+                     style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gray-300);">
+                <span style="color: var(--gray-600); font-size: 0.875rem;">Joriy rasm</span>
+            </div>
+        `;
+    } else {
+        currentImageDiv.innerHTML = '<span style="color: var(--gray-500); font-size: 0.875rem;">Hozirda rasm yo\'q</span>';
+    }
+    
+    // Clear file input
+    document.getElementById('edit_product_image').value = '';
+    
+    openModal('editProductModal');
+}
+</script>
 
 <?php
 $conn->close();

@@ -29,6 +29,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $stmt->close();
         }
+    } elseif ($action === 'edit') {
+        $categoryId = intval($_POST['category_id']);
+        $name = sanitize($_POST['name']);
+        $description = sanitize($_POST['description'] ?? '');
+        
+        if (empty($name)) {
+            $error = 'Kategoriya nomini kiriting';
+        } else {
+            $stmt = $conn->prepare("UPDATE categories SET name = ?, description = ? WHERE id = ?");
+            $stmt->bind_param("ssi", $name, $description, $categoryId);
+            
+            if ($stmt->execute()) {
+                $success = 'Kategoriya muvaffaqiyatli yangilandi';
+            } else {
+                $error = 'Xatolik: ' . $stmt->error;
+            }
+            $stmt->close();
+        }
     } elseif ($action === 'delete') {
         $categoryId = intval($_POST['category_id']);
         
@@ -101,6 +119,7 @@ include '../includes/header.php';
                                     <td><?= htmlspecialchars($category['creator_name']) ?></td>
                                     <td><?= formatDate($category['created_at']) ?></td>
                                     <td>
+                                        <button onclick="openEditCategoryModal(<?= $category['id'] ?>, '<?= htmlspecialchars($category['name'], ENT_QUOTES) ?>', '<?= htmlspecialchars($category['description'] ?? '', ENT_QUOTES) ?>')" class="btn btn-primary btn-sm">✏️</button>
                                         <form method="POST" style="display: inline;" onsubmit="return confirmDelete('Bu kategoriyani o\'chirmoqchimisiz?')">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
@@ -150,6 +169,44 @@ include '../includes/header.php';
         </form>
     </div>
 </div>
+
+<!-- Edit Category Modal -->
+<div id="editCategoryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Kategoriyani tahrirlash</h2>
+            <button class="close-modal" onclick="closeModal('editCategoryModal')">&times;</button>
+        </div>
+        <form method="POST">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="category_id" id="edit_category_id">
+            
+            <div class="form-group">
+                <label class="form-label">Kategoriya nomi *</label>
+                <input type="text" name="name" id="edit_category_name" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tavsif</label>
+                <textarea name="description" id="edit_category_description" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editCategoryModal')">Bekor qilish</button>
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditCategoryModal(id, name, description) {
+    document.getElementById('edit_category_id').value = id;
+    document.getElementById('edit_category_name').value = name;
+    document.getElementById('edit_category_description').value = description;
+    openModal('editCategoryModal');
+}
+</script>
 
 <?php
 $conn->close();

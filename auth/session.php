@@ -4,6 +4,8 @@
  * Fast Food Management System
  */
 
+$SESSION_TIMEOUT = 3 * 60 * 60; // 3 soat (sekundda)
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
