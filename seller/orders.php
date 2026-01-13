@@ -110,9 +110,13 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY name");
 
 // Group products by category
 $productsByCategory = [];
+$allProducts = []; // Array to store all products for 'Hammasi' category
+
 while ($product = $products->fetch_assoc()) {
     $catId = $product['category_id'];
     $catName = $product['category_name'] ?? 'Boshqa';
+    
+    // Add to specific category
     if (!isset($productsByCategory[$catId])) {
         $productsByCategory[$catId] = [
             'name' => $catName,
@@ -120,7 +124,26 @@ while ($product = $products->fetch_assoc()) {
         ];
     }
     $productsByCategory[$catId]['products'][] = $product;
+    
+    // Also add to all products array
+    $allProducts[] = $product;
 }
+
+// Add 'Hammasi' category at the beginning with products grouped by category
+$allCategoryGrouped = [];
+foreach ($productsByCategory as $catId => $catData) {
+    $allCategoryGrouped[] = [
+        'category_name' => $catData['name'],
+        'products' => $catData['products']
+    ];
+}
+
+$productsByCategory = [
+    'all' => [
+        'name' => 'Hammasi',
+        'grouped_products' => $allCategoryGrouped // Products grouped by category
+    ]
+] + $productsByCategory; // Prepend to array
 
 // Get settings for cart calculations
 $serviceChargePercentage = floatval(getSetting('service_charge_percentage', 0));
@@ -888,25 +911,59 @@ body {
             <div class="products-container">
                 <?php foreach ($productsByCategory as $catId => $catData): ?>
                 <div class="category-products <?= $catId === array_key_first($productsByCategory) ? 'active' : '' ?>" id="category-<?= $catId ?>">
-                    <div class="product-grid">
-                        <?php foreach ($catData['products'] as $product): ?>
-                            <div class="product-card" onclick="addToCart(<?= htmlspecialchars(json_encode($product)) ?>)">
-                                <?php if ($product['image']): ?>
-                                    <img src="/xpos/uploads/products/<?= htmlspecialchars($product['image']) ?>" 
-                                         class="product-image" 
-                                         alt="<?= htmlspecialchars($product['name']) ?>">
-                                <?php else: ?>
-                                    <div class="product-image">📦</div>
-                                <?php endif; ?>
-                                <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
-                                    <?= htmlspecialchars($product['name']) ?>
-                                </div>
-                                <div style="color: var(--success); font-weight: 700; font-size: 1.1rem;">
-                                    <?= formatCurrency($product['price']) ?>
-                                </div>
+                    <?php if ($catId === 'all' && isset($catData['grouped_products'])): ?>
+                        <!-- Special handling for 'Hammasi' - show products grouped by category -->
+                        <?php foreach ($catData['grouped_products'] as $group): ?>
+                            <!-- Category Group Header -->
+                            <div style="margin-top: 1.5rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-200);">
+                                <h3 style="margin: 0; font-size: 1.125rem; font-weight: 700; color: var(--primary-700);">
+                                    <?= htmlspecialchars($group['category_name']) ?>
+                                </h3>
+                            </div>
+                            
+                            <!-- Products in this category -->
+                            <div class="product-grid" style="margin-bottom: 1rem;">
+                                <?php foreach ($group['products'] as $product): ?>
+                                    <div class="product-card" onclick="addToCart(<?= htmlspecialchars(json_encode($product)) ?>)">
+                                        <?php if ($product['image']): ?>
+                                            <img src="/xpos/uploads/products/<?= htmlspecialchars($product['image']) ?>" 
+                                                 class="product-image" 
+                                                 alt="<?= htmlspecialchars($product['name']) ?>">
+                                        <?php else: ?>
+                                            <div class="product-image">📦</div>
+                                        <?php endif; ?>
+                                        <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                                            <?= htmlspecialchars($product['name']) ?>
+                                        </div>
+                                        <div style="color: var(--success); font-weight: 700; font-size: 1.1rem;">
+                                            <?= formatCurrency($product['price']) ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         <?php endforeach; ?>
-                    </div>
+                    <?php else: ?>
+                        <!-- Normal category display -->
+                        <div class="product-grid">
+                            <?php foreach ($catData['products'] as $product): ?>
+                                <div class="product-card" onclick="addToCart(<?= htmlspecialchars(json_encode($product)) ?>)">
+                                    <?php if ($product['image']): ?>
+                                        <img src="/xpos/uploads/products/<?= htmlspecialchars($product['image']) ?>" 
+                                             class="product-image" 
+                                             alt="<?= htmlspecialchars($product['name']) ?>">
+                                    <?php else: ?>
+                                        <div class="product-image">📦</div>
+                                    <?php endif; ?>
+                                    <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                                        <?= htmlspecialchars($product['name']) ?>
+                                    </div>
+                                    <div style="color: var(--success); font-weight: 700; font-size: 1.1rem;">
+                                        <?= formatCurrency($product['price']) ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
             

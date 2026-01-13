@@ -110,14 +110,59 @@ include '../includes/header.php';
 
 .receipt-modal-content {
     background: white;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
     border-radius: var(--radius-xl);
-    max-width: 500px;
+    max-width: 450px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     text-align: center;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.receipt-modal-content .success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+.receipt-modal-content h2 {
+    margin: 0 0 0.75rem 0;
+    color: var(--success);
+    font-size: 1.75rem;
+}
+
+.receipt-modal-content .modal-description {
+    color: var(--gray-600);
+    margin: 0 0 2rem 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.receipt-modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
 }
 
 /* Mobile Responsive */
@@ -131,52 +176,46 @@ include '../includes/header.php';
     }
     
     .receipt-modal {
-        padding: 0.5rem;
+        padding: 1rem;
     }
     
     .receipt-modal-content {
-        padding: 1.5rem;
-        max-height: 80vh;
+        padding: 2rem 1.5rem;
+        max-height: 85vh;
+    }
+    
+    .receipt-modal-content .success-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5rem;
     }
     
     .receipt-modal-content h2 {
         font-size: 1.5rem;
     }
-    
-    .receipt-modal-content > div:first-child {
-        font-size: 2.5rem;
-    }
 }
 
 @media (max-width: 480px) {
     .receipt-modal-content {
-        padding: 1rem;
+        padding: 1.5rem 1rem;
         border-radius: var(--radius-lg);
+    }
+    
+    .receipt-modal-content .success-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+        margin-bottom: 1rem;
     }
     
     .receipt-modal-content h2 {
         font-size: 1.25rem;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
     }
     
-    .receipt-modal-content p {
+    .receipt-modal-content .modal-description {
         font-size: 0.9rem;
         margin-bottom: 1.5rem;
-    }
-    
-    .receipt-modal-content > div:first-child {
-        font-size: 2rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    /* Stack buttons vertically on very small screens */
-    .receipt-modal-content > div:last-child {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .receipt-modal-content .btn {
-        width: 100%;
     }
 }
 
@@ -278,17 +317,17 @@ include '../includes/header.php';
 <?php if (isset($showReceiptModal)): ?>
 <div class="receipt-modal active" id="receiptModal">
     <div class="receipt-modal-content">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-        <h2 style="margin-bottom: 1rem; color: var(--success);">Buyurtma yakunlandi!</h2>
-        <p style="color: var(--gray-600); margin-bottom: 2rem;">
+        <div class="success-icon">✅</div>
+        <h2>Buyurtma yakunlandi!</h2>
+        <p class="modal-description">
             Buyurtma #<?= $orderId ?> muvaffaqiyatli yakunlandi
         </p>
         
-        <div style="display: flex; gap: 1rem; justify-content: center;">
-            <a href="receipt.php?id=<?= $orderId ?>" class="btn btn-primary btn-lg">
+        <div class="receipt-modal-buttons">
+            <a href="receipt.php?id=<?= $orderId ?>" class="btn btn-primary">
                 🖨️ Chek chiqarish
             </a>
-            <a href="<?= $userRole === 'manager' ? '../manager/orders.php' : 'pending_orders.php' ?>" class="btn btn-outline btn-lg">
+            <a href="<?= $userRole === 'manager' ? '../manager/orders.php' : 'pending_orders.php' ?>" class="btn btn-outline">
                 ← Buyurtmalarga qaytish
             </a>
         </div>

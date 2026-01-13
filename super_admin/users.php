@@ -24,15 +24,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $hashedPassword = hashPassword($password);
             
-            $stmt = $conn->prepare("INSERT INTO users (name, phone, login, password, role) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssss", $name, $phone, $login, $hashedPassword, $role);
+            // Enable mysqli exceptions
+            mysqli_report(MYSQLI_REPORT_OFF);
             
-            if ($stmt->execute()) {
-                $success = 'Foydalanuvchi muvaffaqiyatli qo\'shildi';
-            } else {
-                $error = 'Xatolik: ' . $stmt->error;
+            try {
+                $stmt = $conn->prepare("INSERT INTO users (name, phone, login, password, role) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssss", $name, $phone, $login, $hashedPassword, $role);
+                
+                if ($stmt->execute()) {
+                    $success = 'Foydalanuvchi muvaffaqiyatli qo\'shildi';
+                } else {
+                    // Check for duplicate entry (error code 1062)
+                    $errorCode = $conn->errno;
+                    $errorText = $conn->error;
+                    
+                    if ($errorCode === 1062) {
+                        $errorMsg = strtolower($errorText);
+                        if (strpos($errorMsg, 'login') !== false || strpos($errorMsg, 'users_login') !== false) {
+                            $error = 'Bunday login allaqachon mavjud! Iltimos, boshqa login tanlang.';
+                        } elseif (strpos($errorMsg, 'phone') !== false || strpos($errorMsg, 'users_phone') !== false) {
+                            $error = 'Bunday telefon raqam allaqachon mavjud! Iltimos, boshqa telefon raqam kiriting.';
+                        } else {
+                            $error = 'Bunday ma\'lumot allaqachon mavjud! Iltimos, boshqa ma\'lumot kiriting.';
+                        }
+                    } else {
+                        $error = 'Xatolik: ' . $errorText;
+                    }
+                }
+                $stmt->close();
+            } catch (Exception $e) {
+                $error = 'Xatolik: ' . $e->getMessage();
             }
-            $stmt->close();
         }
     } elseif ($action === 'edit') {
         $userId = intval($_POST['user_id']);
@@ -46,24 +68,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($name) || empty($phone) || empty($login) || empty($role)) {
             $error = 'Barcha maydonlarni to\'ldiring';
         } else {
-            // Update user - password is optional
-            if (!empty($password)) {
-                // Update with new password
-                $hashedPassword = hashPassword($password);
-                $stmt = $conn->prepare("UPDATE users SET name = ?, phone = ?, login = ?, password = ?, role = ? WHERE id = ? AND role != 'super_admin'");
-                $stmt->bind_param("sssssi", $name, $phone, $login, $hashedPassword, $role, $userId);
-            } else {
-                // Update without changing password
-                $stmt = $conn->prepare("UPDATE users SET name = ?, phone = ?, login = ?, role = ? WHERE id = ? AND role != 'super_admin'");
-                $stmt->bind_param("ssssi", $name, $phone, $login, $role, $userId);
-            }
+            // Enable mysqli exceptions
+            mysqli_report(MYSQLI_REPORT_OFF);
             
-            if ($stmt->execute()) {
-                $success = 'Foydalanuvchi muvaffaqiyatli yangilandi';
-            } else {
-                $error = 'Xatolik: ' . $stmt->error;
+            try {
+                // Update user - password is optional
+                if (!empty($password)) {
+                    // Update with new password
+                    $hashedPassword = hashPassword($password);
+                    $stmt = $conn->prepare("UPDATE users SET name = ?, phone = ?, login = ?, password = ?, role = ? WHERE id = ? AND role != 'super_admin'");
+                    $stmt->bind_param("sssssi", $name, $phone, $login, $hashedPassword, $role, $userId);
+                } else {
+                    // Update without changing password
+                    $stmt = $conn->prepare("UPDATE users SET name = ?, phone = ?, login = ?, role = ? WHERE id = ? AND role != 'super_admin'");
+                    $stmt->bind_param("ssssi", $name, $phone, $login, $role, $userId);
+                }
+                
+                if ($stmt->execute()) {
+                    $success = 'Foydalanuvchi muvaffaqiyatli yangilandi';
+                } else {
+                    // Check for duplicate entry (error code 1062)
+                    $errorCode = $conn->errno;
+                    $errorText = $conn->error;
+                    
+                    if ($errorCode === 1062) {
+                        $errorMsg = strtolower($errorText);
+                        if (strpos($errorMsg, 'login') !== false || strpos($errorMsg, 'users_login') !== false) {
+                            $error = 'Bunday login allaqachon mavjud! Iltimos, boshqa login tanlang.';
+                        } elseif (strpos($errorMsg, 'phone') !== false || strpos($errorMsg, 'users_phone') !== false) {
+                            $error = 'Bunday telefon raqam allaqachon mavjud! Iltimos, boshqa telefon raqam kiriting.';
+                        } else {
+                            $error = 'Bunday ma\'lumot allaqachon mavjud! Iltimos, boshqa ma\'lumot kiriting.';
+                        }
+                    } else {
+                        $error = 'Xatolik: ' . $errorText;
+                    }
+                }
+                $stmt->close();
+            } catch (Exception $e) {
+                $error = 'Xatolik: ' . $e->getMessage();
             }
-            $stmt->close();
         }
     } elseif ($action === 'delete') {
         $userId = intval($_POST['user_id']);
@@ -102,7 +146,7 @@ include '../includes/header.php';
     <?php endif; ?>
     
     <?php if (isset($error)): ?>
-        <div class="alert alert-danger"><?= $error ?></div>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
     
     <div class="card">
@@ -262,6 +306,8 @@ include '../includes/header.php';
         </form>
     </div>
 </div>
+
+
 
 <script>
 function openEditUserModal(user) {
