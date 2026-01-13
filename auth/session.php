@@ -4,6 +4,8 @@
  * Fast Food Management System
  */
 
+require_once __DIR__ . '/../config/database.php';
+
 $SESSION_TIMEOUT = 3 * 60 * 60; // 3 soat (sekundda)
 
 // Start session if not already started
@@ -23,7 +25,7 @@ function isLoggedIn() {
  */
 function requireLogin() {
     if (!isLoggedIn()) {
-        header("Location: /xpos/login.php");
+        header("Location: " . baseUrl('login.php'));
         exit();
     }
 }
@@ -36,12 +38,12 @@ function requireRole($allowedRoles) {
     
     if (is_array($allowedRoles)) {
         if (!in_array($_SESSION['user_role'], $allowedRoles)) {
-            header("Location: /xpos/unauthorized.php");
+            header("Location: " . baseUrl('unauthorized.php'));
             exit();
         }
     } else {
         if ($_SESSION['user_role'] !== $allowedRoles) {
-            header("Location: /xpos/unauthorized.php");
+            header("Location: " . baseUrl('unauthorized.php'));
             exit();
         }
     }
@@ -53,13 +55,13 @@ function requireRole($allowedRoles) {
 function getDashboardUrl($role) {
     switch ($role) {
         case 'super_admin':
-            return '/xpos/super_admin/dashboard.php';
+            return baseUrl('super_admin/dashboard.php');
         case 'manager':
-            return '/xpos/manager/dashboard.php';
+            return baseUrl('manager/dashboard.php');
         case 'seller':
-            return '/xpos/seller/dashboard.php';
+            return baseUrl('seller/dashboard.php');
         default:
-            return '/xpos/login.php';
+            return baseUrl('login.php');
     }
 }
 

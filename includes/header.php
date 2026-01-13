@@ -15,7 +15,7 @@ $userInitial = substr($userName, 0, 1);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $pageTitle ?? 'Fast Food Management System' ?></title>
-    <link rel="stylesheet" href="/xpos/assets/css/style.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= baseUrl('assets/css/style.css') ?>?v=<?= time() ?>">
     <?php if (isset($additionalCSS)): ?>
         <?php foreach ($additionalCSS as $css): ?>
             <link rel="stylesheet" href="<?= $css ?>">
@@ -32,7 +32,7 @@ $userInitial = substr($userName, 0, 1);
                 <span></span>
             </button>
             
-            <a href="/xpos/" class="navbar-brand">
+            <a href="<?= baseUrl() ?>" class="navbar-brand">
                 <span>🍔</span>
                 <span>Fast Food</span>
             </a>
@@ -43,74 +43,74 @@ $userInitial = substr($userName, 0, 1);
             <ul class="navbar-menu" id="navbarMenu">
                 <?php if ($userRole === 'super_admin'): ?>
                     <li>
-                        <a href="/xpos/super_admin/dashboard.php" class="navbar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('super_admin/dashboard.php') ?>" class="navbar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
                             Dashboard
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/super_admin/users.php" class="navbar-link <?= $currentPage === 'users.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('super_admin/users.php') ?>" class="navbar-link <?= $currentPage === 'users.php' ? 'active' : '' ?>">
                             Foydalanuvchilar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/manager/orders.php" class="navbar-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('manager/orders.php') ?>" class="navbar-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>">
                             Buyurtmalar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/super_admin/reports.php" class="navbar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('super_admin/reports.php') ?>" class="navbar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
                             Hisobotlar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/super_admin/settings.php" class="navbar-link <?= $currentPage === 'settings.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('super_admin/settings.php') ?>" class="navbar-link <?= $currentPage === 'settings.php' ? 'active' : '' ?>">
                             Sozlamalar
                         </a>
                     </li>
                 <?php elseif ($userRole === 'manager'): ?>
                     <li>
-                        <a href="/xpos/manager/dashboard.php" class="navbar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('manager/dashboard.php') ?>" class="navbar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
                             Dashboard
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/manager/categories.php" class="navbar-link <?= $currentPage === 'categories.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('manager/categories.php') ?>" class="navbar-link <?= $currentPage === 'categories.php' ? 'active' : '' ?>">
                             Kategoriyalar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/manager/products.php" class="navbar-link <?= $currentPage === 'products.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('manager/products.php') ?>" class="navbar-link <?= $currentPage === 'products.php' ? 'active' : '' ?>">
                             Mahsulotlar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/manager/orders.php" class="navbar-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('manager/orders.php') ?>" class="navbar-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>">
                             Buyurtmalar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/manager/reports.php" class="navbar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('manager/reports.php') ?>" class="navbar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
                             Hisobotlar
                         </a>
                     </li>
                 <?php elseif ($userRole === 'seller'): ?>
                     <li>
-                        <a href="/xpos/seller/dashboard.php" class="navbar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('seller/dashboard.php') ?>" class="navbar-link <?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
                             Dashboard
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/seller/orders.php" class="navbar-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('seller/orders.php') ?>" class="navbar-link <?= $currentPage === 'orders.php' ? 'active' : '' ?>">
                             Buyurtmalar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/seller/pending_orders.php" class="navbar-link <?= $currentPage === 'pending_orders.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('seller/pending_orders.php') ?>" class="navbar-link <?= $currentPage === 'pending_orders.php' ? 'active' : '' ?>">
                             Ochiq buyurtmalar
                         </a>
                     </li>
                     <li>
-                        <a href="/xpos/seller/reports.php" class="navbar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
+                        <a href="<?= baseUrl('seller/reports.php') ?>" class="navbar-link <?= $currentPage === 'reports.php' ? 'active' : '' ?>">
                             Hisobotlar
                         </a>
                     </li>
@@ -123,8 +123,8 @@ $userInitial = substr($userName, 0, 1);
                         <span>▼</span>
                     </button>
                     <div class="dropdown-menu" id="userDropdown">
-                        <a href="/xpos/profile.php" class="dropdown-item">👤 Profil</a>
-                        <a href="/xpos/auth/logout.php" class="dropdown-item">🚪 Chiqish</a>
+                        <a href="<?= baseUrl('profile.php') ?>" class="dropdown-item">👤 Profil</a>
+                        <a href="<?= baseUrl('auth/logout.php') ?>" class="dropdown-item">🚪 Chiqish</a>
                     </div>
                 </li>
             </ul>
